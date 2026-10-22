@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+build/
+*.local
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+**/credentials.json
+**/secrets.json
+**/*.pem
+**/*.key
+
+# Logs / temp
+*.log
+.tmp/
+tmp/
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Python (future backend)
+.venv/
+venv/
+**/__pycache__/
+**/*.pyc
+**/*.egg-info/
+
+# Local DBs / dumps
+**/*.sqlite
+**/*.db
+**/*.dump
+**/dumps/
+**/backups/
+
+# Coverage / test artifacts
+coverage/
+test-results/
+
+# ── Local Cursor / agent context (not for GitHub) ───────────
+# Keep rules & agent docs on the machine only. Jury-facing
+# submission docs (architecture, OpenAPI, etc.) add later under
+# a tracked path, e.g. docs/submission/, or un-ignore selectively.
+.cursor/
+.cursorignore
+.cursorindexingignore
+AGENTS.md
+current_status.md
+docs/
