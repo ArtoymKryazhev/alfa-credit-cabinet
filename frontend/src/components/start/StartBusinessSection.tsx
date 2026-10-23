@@ -1,9 +1,22 @@
+import type { ReactNode } from 'react'
 import bizAccount from '../../assets/start/biz-account.png'
 import bizAcquiring from '../../assets/start/biz-acquiring.png'
+import bizCards from '../../assets/start/biz-cards.png'
 import bizCredits from '../../assets/start/biz-credits.png'
+import bizLoyalty from '../../assets/start/biz-loyalty.png'
+import bizPayroll from '../../assets/start/biz-payroll.png'
 import bizRegister from '../../assets/start/biz-register.png'
+import bizVed from '../../assets/start/biz-ved.png'
 
-const cards = [
+type BizCard = {
+  src: string
+  title: ReactNode
+  subtitle: ReactNode
+  left: number
+  top: number
+}
+
+const cards: BizCard[] = [
   {
     src: bizRegister,
     title: (
@@ -15,30 +28,86 @@ const cards = [
     ),
     subtitle: 'Онлайн за\u00a00\u202f₽',
     left: 390,
+    top: 204,
   },
   {
     src: bizAccount,
     title: 'Расчётный счёт',
     subtitle: 'Бесплатно',
     left: 681,
+    top: 204,
   },
   {
     src: bizCredits,
     title: 'Кредиты',
     subtitle: 'На развитие бизнеса',
     left: 972,
+    top: 204,
   },
   {
     src: bizAcquiring,
     title: 'Эквайринг',
     subtitle: 'Комиссия от\u00a01%',
     left: 1263,
+    top: 204,
   },
-] as const
+  {
+    src: bizCards,
+    title: 'Бизнес-карты',
+    subtitle: 'С\u00a0кэшбэком 10%',
+    left: 390,
+    top: 526,
+  },
+  {
+    src: bizPayroll,
+    title: (
+      <>
+        Зарплатный
+        <br />
+        проект
+      </>
+    ),
+    subtitle: 'Зачисление от\u00a01\u00a0минуты',
+    left: 681,
+    top: 526,
+  },
+  {
+    src: bizVed,
+    title: 'ВЭД',
+    subtitle: (
+      <>
+        Счёт и\u00a0валютный
+        <br />
+        контроль бесплатно
+      </>
+    ),
+    left: 972,
+    top: 526,
+  },
+  {
+    src: bizLoyalty,
+    title: (
+      <>
+        Программа
+        <br />
+        лояльности
+      </>
+    ),
+    subtitle: (
+      <>
+        Выгодные предложения
+        <br />
+        от\u00a0банка и\u00a0партнёров
+      </>
+    ),
+    left: 1263,
+    top: 526,
+  },
+]
 
 export function StartBusinessSection() {
   return (
-    <section className="absolute inset-x-0 top-[786px] h-[463px] bg-[#f2f3f5]">
+    <section className="absolute inset-x-0 top-[786px] h-[824px] bg-white">
       <h2 className="absolute left-[390px] top-[72px] m-0 text-[40px] font-bold leading-[48px] text-[rgba(3,3,6,0.88)]">
         Лучшее для бизнеса
       </h2>
@@ -58,9 +127,9 @@ export function StartBusinessSection() {
 
       {cards.map((card) => (
         <div
-          key={card.left}
-          className="absolute top-[204px] h-[298px] w-[267px] overflow-hidden rounded-[32px] bg-[#f2f3f5]"
-          style={{ left: card.left }}
+          key={`${card.left}-${card.top}`}
+          className="absolute h-[298px] w-[267px] overflow-hidden rounded-[32px] bg-[#f2f3f5]"
+          style={{ left: card.left, top: card.top }}
         >
           <img src={card.src} alt="" className="absolute inset-0 size-full object-cover" />
           <div className="absolute inset-x-8 top-8 text-center text-[22px] font-bold leading-[26px] tracking-[0.2px] text-[rgba(3,3,6,0.88)]">

@@ -5,17 +5,21 @@ import { StartHeroCards } from '../components/start/StartHeroCards'
 
 export function LoginPage() {
   return (
-    <div className="min-h-screen overflow-auto bg-[#0b0b0c]">
-      <div className="relative mx-auto h-[1249px] w-[1920px] overflow-hidden font-['Segoe_UI',system-ui,sans-serif]">
-        <StartHeroCards />
-        <StartBusinessSection />
-        <StartHeader />
+    <div className="login-page relative min-h-screen overflow-hidden bg-[#0b0b0c] font-['Segoe_UI',system-ui,sans-serif]">
+      <div className="login-light-bleed" aria-hidden />
 
-        {/* Dim overlay — covers landing under the open login panel */}
-        <div className="absolute inset-0 z-20 bg-black/55" aria-hidden />
-
-        <LoginSidePanel />
+      <div className="flex min-h-screen items-start justify-center">
+        <div className="login-desktop-artboard relative overflow-hidden">
+          <StartHeroCards />
+          <StartBusinessSection />
+          <StartHeader />
+        </div>
       </div>
+
+      {/* Dim over landing + bleeds; panel sits above */}
+      <div className="pointer-events-none absolute inset-0 z-20 bg-black/55" aria-hidden />
+
+      <LoginSidePanel />
     </div>
   )
 }

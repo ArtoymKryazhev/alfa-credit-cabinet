@@ -36,7 +36,7 @@ body {
 }
 
 /*
-  Desktop proportional scale (app only for now).
+  Desktop proportional scale — /app (long scroll).
   Design frame 1920 → floor 1440 (0.75).
   Below 1920: width stays 1920 so zoom → layout ≈ 100vw.
   Above 1920: width 100% (full-bleed backgrounds); zoom = 1.
@@ -45,4 +45,55 @@ body {
   width: max(100%, 1920px);
   margin-inline: auto;
   zoom: clamp(0.75, 100vw / 1920px, 1);
+}
+
+/*
+  Desktop proportional scale — /login (1920×1610: hero 786 + business 824).
+  Top-pinned; black sides only; light bleed from hero down;
+  panel full-height at viewport right, inner vertically centered.
+*/
+.login-page {
+  --login-scale: clamp(0.75, min(100vw / 1920px, 100vh / 1610px), 1);
+  --login-frame-h: calc(1610px * var(--login-scale));
+  --login-hero-h: calc(786px * var(--login-scale));
+}
+
+.login-desktop-artboard {
+  width: 1920px;
+  height: 1610px;
+  margin-inline: auto;
+  zoom: var(--login-scale);
+}
+
+/* Continues #f2f3f5 from hero bottom to viewport bottom (top-pinned artboard) */
+.login-light-bleed {
+  position: absolute;
+  inset-inline: 0;
+  top: var(--login-hero-h);
+  bottom: 0;
+  background: #fff;
+}
+
+/* Full-height white panel docked to viewport right; inner keeps Figma 500×1249 */
+.login-side-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  width: calc(500px * var(--login-scale));
+  overflow: hidden;
+  border-top-left-radius: calc(24px * var(--login-scale));
+  border-bottom-left-radius: calc(24px * var(--login-scale));
+  background: #fff;
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.18);
+}
+
+.login-side-panel-inner {
+  position: relative;
+  width: 500px;
+  height: 1249px;
+  zoom: var(--login-scale);
 }
