@@ -34,3 +34,15 @@ body {
     cursor: pointer;
   }
 }
+
+/*
+  Desktop proportional scale (app only for now).
+  Design frame 1920 → floor 1440 (0.75).
+  Below 1920: width stays 1920 so zoom → layout ≈ 100vw.
+  Above 1920: width 100% (full-bleed backgrounds); zoom = 1.
+*/
+.app-desktop-artboard {
+  width: max(100%, 1920px);
+  margin-inline: auto;
+  zoom: clamp(0.75, 100vw / 1920px, 1);
+}

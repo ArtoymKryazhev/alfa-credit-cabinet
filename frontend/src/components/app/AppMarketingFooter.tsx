@@ -35,7 +35,7 @@ export function AppMarketingFooter() {
         </div>
       </div>
 
-      <footer className="relative z-10 w-full rounded-t-[64px] bg-[#121213] pb-16 pt-[206px] text-white">
+      <footer className="relative z-10 mx-auto w-full max-w-[1920px] rounded-t-[64px] bg-[#121213] pb-16 pt-[206px] text-white">
         {/* pt 206 clears promo overlap; +74 → «Малый бизнес» at y≈280 */}
         <div className="mx-auto mt-[74px] w-[1140px]">
           <p className="m-0 text-[14px] leading-5 tracking-[-0.08px] text-white/94">

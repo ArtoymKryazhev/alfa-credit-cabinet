@@ -6,13 +6,21 @@ import { OffersSection } from '../components/app/OffersSection'
 
 export function AppWorkspacePage() {
   return (
-    <div className="min-h-screen overflow-auto bg-[#0b0b0c]">
-      <div className="relative mx-auto min-h-screen w-[1920px] font-['Segoe_UI',system-ui,sans-serif]">
+    <div className="min-h-screen overflow-x-clip overflow-y-auto bg-[#0b0b0c]">
+      <div className="app-desktop-artboard relative min-h-screen font-['Segoe_UI',system-ui,sans-serif]">
         <AppHeader />
-        <OffersFireChip />
+
+        {/* Fire-chip: Figma X in centered 1920 column. Intellect: full-bleed. */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-30">
+          <div className="relative mx-auto w-[1920px]">
+            <div className="pointer-events-auto">
+              <OffersFireChip />
+            </div>
+          </div>
+        </div>
         <AlfaIntellectBar />
 
-        {/* Header in-flow. Fire-chip / intellect — absolute (Figma Y). 355px → promo. */}
+        {/* Full-bleed gray surface; footer capped at 1920 inside. 355px → promo. */}
         <div className="relative z-10 overflow-visible rounded-t-[60px] bg-[#f2f3f5]">
           <OffersSection />
 

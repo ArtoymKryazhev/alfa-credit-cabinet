@@ -2,7 +2,7 @@ import intellectIcon from '../../assets/app/icon-intellect.svg'
 
 export function AlfaIntellectBar() {
   return (
-    <div className="absolute left-0 top-[1172px] z-40 w-[1920px]">
+    <div className="pointer-events-auto absolute inset-x-0 top-[1172px] z-40">
       <div className="bg-[#e7e8eb] pt-1">
         <div className="relative flex h-[49px] items-center justify-between overflow-hidden rounded-t-[14px] bg-[#f2f3f5] px-1.5 shadow-[inset_0.7px_0.7px_1.4px_0_white]">
           <button type="button" className="flex h-[19px] w-[162px] items-center gap-2 px-1.5">
