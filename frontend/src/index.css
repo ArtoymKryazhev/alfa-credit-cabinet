@@ -27,3 +27,10 @@ body {
 #root {
   min-height: 100vh;
 }
+
+@layer base {
+  button {
+    font: inherit;
+    cursor: pointer;
+  }
+}

@@ -1,18 +1,26 @@
+import { AlfaIntellectBar } from '../components/app/AlfaIntellectBar'
+import { AppHeader } from '../components/app/AppHeader'
+import { AppMarketingFooter } from '../components/app/AppMarketingFooter'
+import { OffersFireChip } from '../components/app/OffersFireChip'
+import { OffersSection } from '../components/app/OffersSection'
+
 export function AppWorkspacePage() {
   return (
-    <main className="min-h-screen px-6 py-8">
-      <header className="mx-auto max-w-5xl">
-        <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
-          Рабочая область
-        </p>
-        <h1 className="mt-1 text-2xl font-semibold text-slate-900">
-          Умный кредитный кабинет
-        </h1>
-        <p className="mt-2 max-w-2xl text-sm text-slate-600">
-          Заглушка основного экрана. Контент и wizard появятся после макета Figma
-          и фиксации границ MVP.
-        </p>
-      </header>
-    </main>
+    <div className="min-h-screen overflow-auto bg-[#0b0b0c]">
+      <div className="relative mx-auto min-h-screen w-[1920px] font-['Segoe_UI',system-ui,sans-serif]">
+        <AppHeader />
+        <OffersFireChip />
+        <AlfaIntellectBar />
+
+        {/* Header in-flow. Fire-chip / intellect — absolute (Figma Y). 355px → promo. */}
+        <div className="relative z-10 overflow-visible rounded-t-[60px] bg-[#f2f3f5]">
+          <OffersSection />
+
+          <div className="h-[355px]" aria-hidden />
+
+          <AppMarketingFooter />
+        </div>
+      </div>
+    </div>
   )
 }
