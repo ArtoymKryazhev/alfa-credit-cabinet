@@ -7,7 +7,23 @@ import avatarImg from '../../assets/app/avatar-accountant.png'
 import backArrow from '../../assets/app/icon-back-arrow.svg'
 import lampProgress from '../../assets/app/icon-lamp-progress.png'
 
-export function AppHeader() {
+export type AppSection = 'products' | 'business'
+
+type AppHeaderProps = {
+  activeSection?: AppSection
+  onSectionChange?: (section: AppSection) => void
+}
+
+const navItemBase =
+  'flex h-9 items-center justify-center border-0 px-2 text-[12px] leading-4 transition-colors'
+const navItemActive =
+  'rounded-[32px] bg-[#f2f3f5] text-[rgba(3,3,6,0.88)]'
+const navItemIdle = 'bg-transparent text-white/70 hover:text-white'
+
+export function AppHeader({
+  activeSection = 'products',
+  onSectionChange,
+}: AppHeaderProps) {
   return (
     <header className="relative z-20 h-[92px] shrink-0 bg-[#0b0b0c]">
       <div className="relative mx-auto h-full w-[1920px]">
@@ -28,13 +44,25 @@ export function AppHeader() {
         />
 
         <nav className="absolute left-[532px] top-[26px] flex h-10 w-[331px] items-center rounded-[32px] bg-[#242427] p-0.5">
-          <span className="flex h-9 w-[145px] shrink-0 items-center justify-center rounded-[32px] bg-[#f2f3f5] text-[12px] leading-4 text-[rgba(3,3,6,0.88)]">
+          <button
+            type="button"
+            className={`${navItemBase} w-[145px] shrink-0 ${
+              activeSection === 'products' ? navItemActive : navItemIdle
+            }`}
+            onClick={() => onSectionChange?.('products')}
+          >
             Кредитные продукты
-          </span>
-          <span className="flex h-9 flex-1 items-center justify-center px-2 text-[12px] leading-4 text-white/70">
+          </button>
+          <button
+            type="button"
+            className={`${navItemBase} flex-1 ${
+              activeSection === 'business' ? navItemActive : navItemIdle
+            }`}
+            onClick={() => onSectionChange?.('business')}
+          >
             Мой бизнес
-          </span>
-          <span className="flex h-9 flex-1 items-center justify-center px-2 text-[12px] leading-4 text-white/70">
+          </button>
+          <span className={`${navItemBase} flex-1 cursor-default text-white/70`}>
             Мои заявки
           </span>
         </nav>

@@ -50,7 +50,7 @@ body {
 /*
   Desktop proportional scale — /login (1920×1610: hero 786 + business 824).
   Top-pinned; black sides only; light bleed from hero down;
-  panel full-height at viewport right, inner vertically centered.
+  panel fixed to viewport right (viewport height), inner vertically centered.
 */
 .login-page {
   --login-scale: clamp(0.75, min(100vw / 1920px, 100vh / 1610px), 1);
@@ -65,18 +65,20 @@ body {
   zoom: var(--login-scale);
 }
 
-/* Continues #f2f3f5 from hero bottom to viewport bottom (top-pinned artboard) */
+/* Continues #fff from hero bottom to viewport bottom (top-pinned artboard) */
 .login-light-bleed {
   position: absolute;
   inset-inline: 0;
   top: var(--login-hero-h);
   bottom: 0;
+  border-top-left-radius: calc(64px * var(--login-scale));
+  border-top-right-radius: calc(64px * var(--login-scale));
   background: #fff;
 }
 
-/* Full-height white panel docked to viewport right; inner keeps Figma 500×1249 */
+/* Viewport-height white panel docked to viewport right; inner keeps Figma 500×1249 */
 .login-side-panel {
-  position: absolute;
+  position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
@@ -85,10 +87,7 @@ body {
   align-items: center;
   width: calc(500px * var(--login-scale));
   overflow: hidden;
-  border-top-left-radius: calc(24px * var(--login-scale));
-  border-bottom-left-radius: calc(24px * var(--login-scale));
   background: #fff;
-  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.18);
 }
 
 .login-side-panel-inner {
@@ -96,4 +95,48 @@ body {
   width: 500px;
   height: 1249px;
   zoom: var(--login-scale);
+}
+
+/* My Business — form fields + stepper */
+.mb-field {
+  caret-color: #ef3124;
+}
+
+.mb-field:hover:not(:focus) {
+  background-color: rgba(38, 55, 88, 0.08);
+  border-bottom-color: #a0a1a8;
+}
+
+.mb-field:focus {
+  background-color: rgba(38, 55, 88, 0.08);
+}
+
+.mb-field-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%23030306' stroke-opacity='0.55' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+.mb-step-circle {
+  transition:
+    background-color 0.28s ease,
+    color 0.28s ease,
+    transform 0.28s ease,
+    box-shadow 0.28s ease;
+}
+
+.mb-step-circle.is-active {
+  transform: scale(1.06);
+  box-shadow: 0 0 0 4px rgba(239, 49, 36, 0.16);
+}
+
+.mb-step-line-fill {
+  transform-origin: left center;
+  transition: transform 0.4s ease;
+}
+
+.mb-step-title,
+.mb-step-subtitle {
+  transition: color 0.28s ease, opacity 0.28s ease;
 }
