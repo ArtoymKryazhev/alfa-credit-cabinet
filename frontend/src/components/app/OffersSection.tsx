@@ -1,4 +1,6 @@
+import { Fragment } from 'react'
 import chevronIcon from '../../assets/app/icon-chevron.svg'
+import { AlfaPodborCard } from './AlfaPodborCard'
 import { OfferCard } from './OfferCard'
 import { offers } from './offersData'
 
@@ -12,7 +14,7 @@ export function OffersSection() {
           Кредитные предложения
         </h1>
 
-        <div className="mt-14 flex gap-2">
+        <div className="mt-8 flex gap-2">
           {filters.map((label) => (
             <button
               key={label}
@@ -27,7 +29,10 @@ export function OffersSection() {
 
         <div className="mt-6 flex flex-col gap-6">
           {offers.map((offer, index) => (
-            <OfferCard key={offer.id} offer={offer} showBusinessCta={index === 0} />
+            <Fragment key={offer.id}>
+              <OfferCard offer={offer} showBusinessCta={index === 0} />
+              {(index + 1) % 4 === 0 ? <AlfaPodborCard /> : null}
+            </Fragment>
           ))}
         </div>
       </div>

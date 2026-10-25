@@ -2,9 +2,9 @@ import intellectIcon from '../../assets/app/icon-intellect.svg'
 
 export function AlfaIntellectBar() {
   return (
-    <div className="pointer-events-auto absolute inset-x-0 top-[1172px] z-40">
+    <div className="app-intellect-bar-dock pointer-events-auto fixed bottom-0 left-0 z-40">
       <div className="bg-[#e7e8eb] pt-1">
-        <div className="relative flex h-[49px] items-center justify-between overflow-hidden rounded-t-[14px] bg-[#f2f3f5] px-1.5 shadow-[inset_0.7px_0.7px_1.4px_0_white]">
+        <div className="relative flex h-[49px] items-center justify-between overflow-hidden rounded-t-[14px] bg-[#f2f3f5] pl-1.5 pr-[28px] shadow-[inset_0.7px_0.7px_1.4px_0_white]">
           <button type="button" className="flex h-[19px] w-[162px] items-center gap-2 px-1.5">
             <span className="relative flex size-[19px] items-center justify-center overflow-hidden rounded-[10px] bg-gradient-to-br from-[#ef3124] to-[#f859c5]">
               <img src={intellectIcon} alt="" className="size-[13px]" width={13} height={13} />

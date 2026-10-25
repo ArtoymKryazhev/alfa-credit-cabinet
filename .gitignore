@@ -34,12 +34,13 @@ venv/
 **/*.pyc
 **/*.egg-info/
 
-# Local DBs / dumps
+# Local DBs / dumps / backend runtime data
 **/*.sqlite
 **/*.db
 **/*.dump
 **/dumps/
 **/backups/
+backend/.data/
 
 # Coverage / test artifacts
 coverage/
@@ -54,4 +55,6 @@ test-results/
 .cursorindexingignore
 AGENTS.md
 current_status.md
-docs/
+docs/*
+!docs/submission/
+!docs/submission/**

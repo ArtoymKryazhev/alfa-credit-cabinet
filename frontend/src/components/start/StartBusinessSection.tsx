@@ -107,7 +107,7 @@ const cards: BizCard[] = [
 
 export function StartBusinessSection() {
   return (
-    <section className="absolute inset-x-0 top-[786px] h-[824px] bg-white">
+    <section className="absolute inset-x-0 top-[786px] h-[824px] rounded-t-[64px] bg-white">
       <h2 className="absolute left-[390px] top-[72px] m-0 text-[40px] font-bold leading-[48px] text-[rgba(3,3,6,0.88)]">
         Лучшее для бизнеса
       </h2>

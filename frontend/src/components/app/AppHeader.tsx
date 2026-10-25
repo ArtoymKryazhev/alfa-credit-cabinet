@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../auth/AuthContext'
 import alfaLogo from '../../assets/icon-alfa-logo.svg'
 import businessLogo from '../../assets/img-buisnes-logo.png'
 import logoutIcon from '../../assets/icon-logout.svg'
@@ -24,6 +26,17 @@ export function AppHeader({
   activeSection = 'products',
   onSectionChange,
 }: AppHeaderProps) {
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  async function handleLogout() {
+    await logout()
+    navigate('/login', { replace: true })
+  }
+
+  const companyLabel = user?.company_name ?? 'Компания'
+  const personLabel = user?.display_name ?? 'Клиент'
+
   return (
     <header className="relative z-20 h-[92px] shrink-0 bg-[#0b0b0c]">
       <div className="relative mx-auto h-full w-[1920px]">
@@ -107,11 +120,11 @@ export function AppHeader({
               height={40}
             />
             <span className="flex min-w-0 flex-col items-start text-left">
-              <span className="whitespace-nowrap text-[14px] font-medium leading-5 tracking-[0.07px] text-white/88">
-                ООО &quot;АКБ&quot;
+              <span className="max-w-[200px] truncate whitespace-nowrap text-[14px] font-medium leading-5 tracking-[0.07px] text-white/88">
+                {companyLabel}
               </span>
-              <span className="whitespace-nowrap text-[12px] leading-4 tracking-[0.06px] text-white/55">
-                Кутуков А.И.
+              <span className="max-w-[200px] truncate whitespace-nowrap text-[12px] leading-4 tracking-[0.06px] text-white/55">
+                {personLabel}
               </span>
             </span>
           </button>
@@ -130,7 +143,7 @@ export function AppHeader({
               height={24}
             />
             <span className="whitespace-nowrap text-[12px] font-medium leading-4 tracking-[0.19px] text-white/94">
-              Бухгалтер
+              {user?.login ?? 'Клиент'}
             </span>
           </button>
 
@@ -140,6 +153,7 @@ export function AppHeader({
             type="button"
             className="flex size-10 items-center justify-center border-0 bg-transparent p-0"
             aria-label="Выйти"
+            onClick={() => void handleLogout()}
           >
             <img src={logoutIcon} alt="" className="size-5" width={20} height={20} />
           </button>

@@ -16,7 +16,7 @@ export function AppWorkspacePage() {
 
         {section === 'products' ? (
           <>
-            {/* Fire-chip: Figma X in centered 1920 column. Intellect: full-bleed. */}
+            {/* Fire-chip: Figma X in centered 1920 column. Intellect: full-bleed dock outside. */}
             <div className="pointer-events-none absolute inset-x-0 top-0 z-30">
               <div className="relative mx-auto w-[1920px]">
                 <div className="pointer-events-auto">
@@ -24,10 +24,9 @@ export function AppWorkspacePage() {
                 </div>
               </div>
             </div>
-            <AlfaIntellectBar />
 
             {/* Full-bleed gray surface; footer capped at 1920 inside. 388px → footer (Figma gap). */}
-            <div className="relative z-10 overflow-visible rounded-t-[60px] bg-[#f2f3f5]">
+            <div className="relative z-10 overflow-visible rounded-t-[60px] bg-[#f2f3f5] pb-[53px]">
               <OffersSection />
 
               <div className="h-[388px]" aria-hidden />
@@ -41,6 +40,8 @@ export function AppWorkspacePage() {
           </div>
         )}
       </div>
+
+      {section === 'products' ? <AlfaIntellectBar /> : null}
     </div>
   )
 }
