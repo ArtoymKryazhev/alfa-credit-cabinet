@@ -29,14 +29,27 @@ type ApiFetchOptions = Omit<RequestInit, 'body'> & {
   auth?: boolean
 }
 
+function detailFromPayload(data: unknown, fallback: string): string {
+  if (
+    typeof data === 'object' &&
+    data !== null &&
+    'detail' in data &&
+    typeof (data as { detail: unknown }).detail === 'string'
+  ) {
+    return (data as { detail: string }).detail
+  }
+  return fallback
+}
+
 export async function apiFetch<T>(
   path: string,
   options: ApiFetchOptions = {},
 ): Promise<T> {
   const { body, auth = true, headers: initHeaders, ...rest } = options
   const headers = new Headers(initHeaders)
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData
 
-  if (body !== undefined && !headers.has('Content-Type')) {
+  if (body !== undefined && !isFormData && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json')
   }
 
@@ -47,10 +60,19 @@ export async function apiFetch<T>(
     }
   }
 
+  let requestBody: BodyInit | undefined
+  if (body === undefined) {
+    requestBody = undefined
+  } else if (isFormData) {
+    requestBody = body as FormData
+  } else {
+    requestBody = JSON.stringify(body)
+  }
+
   const response = await fetch(`/api${path}`, {
     ...rest,
     headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
+    body: requestBody,
   })
 
   if (response.status === 204) {
@@ -68,15 +90,49 @@ export async function apiFetch<T>(
   }
 
   if (!response.ok) {
-    const detail =
-      typeof data === 'object' &&
-      data !== null &&
-      'detail' in data &&
-      typeof (data as { detail: unknown }).detail === 'string'
-        ? (data as { detail: string }).detail
-        : response.statusText || 'Request failed'
-    throw new ApiError(response.status, detail)
+    throw new ApiError(
+      response.status,
+      detailFromPayload(data, response.statusText || 'Request failed'),
+    )
   }
 
   return data as T
+}
+
+export async function apiFetchBlob(
+  path: string,
+  options: Omit<ApiFetchOptions, 'body'> = {},
+): Promise<Blob> {
+  const { auth = true, headers: initHeaders, ...rest } = options
+  const headers = new Headers(initHeaders)
+
+  if (auth) {
+    const token = getAuthToken()
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`)
+    }
+  }
+
+  const response = await fetch(`/api${path}`, {
+    ...rest,
+    headers,
+  })
+
+  if (!response.ok) {
+    const text = await response.text()
+    let data: unknown = null
+    if (text) {
+      try {
+        data = JSON.parse(text) as unknown
+      } catch {
+        data = text
+      }
+    }
+    throw new ApiError(
+      response.status,
+      detailFromPayload(data, response.statusText || 'Request failed'),
+    )
+  }
+
+  return response.blob()
 }

@@ -9,7 +9,7 @@ import avatarImg from '../../assets/app/avatar-accountant.png'
 import backArrow from '../../assets/app/icon-back-arrow.svg'
 import lampProgress from '../../assets/app/icon-lamp-progress.png'
 
-export type AppSection = 'products' | 'business'
+export type AppSection = 'products' | 'business' | 'applications'
 
 type AppHeaderProps = {
   activeSection?: AppSection
@@ -75,9 +75,15 @@ export function AppHeader({
           >
             Мой бизнес
           </button>
-          <span className={`${navItemBase} flex-1 cursor-default text-white/70`}>
+          <button
+            type="button"
+            className={`${navItemBase} flex-1 ${
+              activeSection === 'applications' ? navItemActive : navItemIdle
+            }`}
+            onClick={() => onSectionChange?.('applications')}
+          >
             Мои заявки
-          </span>
+          </button>
         </nav>
 
         <div className="absolute right-10 top-2 flex h-14 items-center">

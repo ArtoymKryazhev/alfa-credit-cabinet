@@ -1,0 +1,426 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "alfa-credit-cabinet MVP",
+    "description": "API collection for Working Capital MVP (T09). Set baseUrl to http://localhost:8080/api (via nginx) or http://localhost:8000/api. Login requests save Bearer token into collection variable `token`.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api" },
+    { "key": "token", "value": "" },
+    { "key": "applicationId", "value": "" },
+    { "key": "offerId", "value": "" },
+    { "key": "attachmentId", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET health",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login client1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.collectionVariables.set('token', pm.response.json().token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"client1\",\n  \"password\": \"demo\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Login manager",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.collectionVariables.set('token', pm.response.json().token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"manager\",\n  \"password\": \"demo\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "GET me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/auth/me"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/auth/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "GET profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/profile"
+          }
+        },
+        {
+          "name": "POST registry-lookup",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"inn\": \"7701000001\"\n}"
+            },
+            "url": "{{baseUrl}}/profile/registry-lookup"
+          }
+        },
+        {
+          "name": "PUT profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"inn\": \"7701000001\",\n  \"activity_direction\": \"Производство продуктов питания\",\n  \"description\": \"Демо описание\",\n  \"contact_person\": \"Иванов А.А.\",\n  \"contact_phone\": \"+7 (900) 111-00-01\",\n  \"contact_email\": \"client1@demo.local\"\n}"
+            },
+            "url": "{{baseUrl}}/profile"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Applications (client)",
+      "item": [
+        {
+          "name": "Open draft working_capital",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const j = pm.response.json();",
+                  "  if (j.id) pm.collectionVariables.set('applicationId', j.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_code\": \"working_capital\"\n}"
+            },
+            "url": "{{baseUrl}}/applications"
+          }
+        },
+        {
+          "name": "List applications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/applications"
+          }
+        },
+        {
+          "name": "GET application",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const j = pm.response.json();",
+                  "  const offer = (j.active_offer || j.offer || null);",
+                  "  if (offer && offer.id) pm.collectionVariables.set('offerId', offer.id);",
+                  "  if (j.offers && j.offers.length) {",
+                  "    const active = j.offers.find(o => o.active) || j.offers[0];",
+                  "    if (active && active.id) pm.collectionVariables.set('offerId', active.id);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/applications/{{applicationId}}"
+          }
+        },
+        {
+          "name": "PATCH draft params",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_step\": \"review\",\n  \"amount\": 1000000,\n  \"term_months\": 12,\n  \"purpose\": \"goods\"\n}"
+            },
+            "url": "{{baseUrl}}/applications/{{applicationId}}"
+          }
+        },
+        {
+          "name": "Submit",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/applications/{{applicationId}}/submit"
+          }
+        },
+        {
+          "name": "Answer clarification (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "answer_text", "value": "Предоставляем пояснение по обороту за квартал.", "type": "text" },
+                { "key": "file", "type": "file", "src": [], "description": "Optional pdf/png/jpg ≤5MB" }
+              ]
+            },
+            "url": "{{baseUrl}}/applications/{{applicationId}}/answer"
+          }
+        },
+        {
+          "name": "Accept offer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"offer_id\": \"{{offerId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/applications/{{applicationId}}/offer/accept"
+          }
+        },
+        {
+          "name": "Decline offer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"offer_id\": \"{{offerId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/applications/{{applicationId}}/offer/decline"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Manager",
+      "item": [
+        {
+          "name": "List queue",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/manager/applications?attention=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["manager", "applications"],
+              "query": [{ "key": "attention", "value": "true" }]
+            }
+          }
+        },
+        {
+          "name": "GET application",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/manager/applications/{{applicationId}}"
+          }
+        },
+        {
+          "name": "Request clarification",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Уточните структуру выручки за последние 3 месяца.\"\n}"
+            },
+            "url": "{{baseUrl}}/manager/applications/{{applicationId}}/request-clarification"
+          }
+        },
+        {
+          "name": "Approve",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/manager/applications/{{applicationId}}/approve"
+          }
+        },
+        {
+          "name": "Offer reduced",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 500000,\n  \"term_months\": 12\n}"
+            },
+            "url": "{{baseUrl}}/manager/applications/{{applicationId}}/offer-reduced"
+          }
+        },
+        {
+          "name": "Decline",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Недостаточная платёжная дисциплина\"\n}"
+            },
+            "url": "{{baseUrl}}/manager/applications/{{applicationId}}/decline"
+          }
+        },
+        {
+          "name": "Recheck",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/manager/applications/{{applicationId}}/recheck"
+          }
+        }
+      ]
+    },
+    {
+      "name": "News / Attachments",
+      "item": [
+        {
+          "name": "GET news",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/news"
+          }
+        },
+        {
+          "name": "GET attachment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/attachments/{{attachmentId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Negative",
+      "item": [
+        {
+          "name": "No token → 401",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/auth/me"
+          }
+        },
+        {
+          "name": "Client on manager queue → 403",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/manager/applications",
+            "description": "Run after Login client1. Expect 403."
+          }
+        },
+        {
+          "name": "Bad password → 401",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"client1\",\n  \"password\": \"wrong\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Unknown INN registry → error",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"inn\": \"0000000000\"\n}"
+            },
+            "url": "{{baseUrl}}/profile/registry-lookup"
+          }
+        },
+        {
+          "name": "Resubmit → 409",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/applications/{{applicationId}}/submit",
+            "description": "Call on already submitted application. Expect 409."
+          }
+        }
+      ]
+    }
+  ]
+}

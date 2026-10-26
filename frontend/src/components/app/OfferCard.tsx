@@ -1,4 +1,3 @@
-import { BusinessStoryCta } from './BusinessStoryCta'
 import type { Offer } from './offersData'
 
 const badgeClass: Record<NonNullable<Offer['badge']>['tone'], string> = {
@@ -8,10 +7,17 @@ const badgeClass: Record<NonNullable<Offer['badge']>['tone'], string> = {
 
 type OfferCardProps = {
   offer: Offer
-  showBusinessCta?: boolean
+  onApply?: (offer: Offer) => void
+  applyBusy?: boolean
 }
 
-export function OfferCard({ offer, showBusinessCta = false }: OfferCardProps) {
+export function OfferCard({
+  offer,
+  onApply,
+  applyBusy = false,
+}: OfferCardProps) {
+  const canApply = Boolean(offer.productCode)
+
   return (
     <article className="relative flex min-h-[250px] w-full items-center overflow-hidden rounded-[12px] bg-white px-6 py-[43px]">
       <div className="relative z-10 flex w-[calc(100%-328px)] max-w-[600px] flex-col">
@@ -43,22 +49,31 @@ export function OfferCard({ offer, showBusinessCta = false }: OfferCardProps) {
         </p>
 
         <div className="flex items-center gap-8">
-          <button
-            type="button"
-            className="h-10 min-w-[88px] shrink-0 rounded-[10px] border-0 bg-[rgba(15,25,55,0.1)] px-5 text-[14px] font-medium leading-5 tracking-[0.07px] text-[rgba(3,3,6,0.88)]"
-          >
-            Оформить
-          </button>
-          {showBusinessCta ? (
-            <BusinessStoryCta />
+          {canApply ? (
+            <button
+              type="button"
+              className="h-10 min-w-[88px] shrink-0 rounded-[10px] border-0 bg-[rgba(15,25,55,0.1)] px-5 text-[14px] font-medium leading-5 tracking-[0.07px] text-[rgba(3,3,6,0.88)] disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={applyBusy}
+              onClick={() => onApply?.(offer)}
+            >
+              {applyBusy ? 'Открытие…' : 'Оформить'}
+            </button>
           ) : (
             <button
               type="button"
-              className="border-0 bg-transparent text-[14px] font-medium leading-5 tracking-[0.07px] text-[rgba(3,3,6,0.88)]"
+              className="h-10 min-w-[88px] shrink-0 cursor-not-allowed rounded-[10px] border-0 bg-[rgba(15,25,55,0.06)] px-5 text-[14px] font-medium leading-5 tracking-[0.07px] text-[rgba(3,3,6,0.45)]"
+              disabled
+              title="В демо недоступно"
             >
-              Все условия
+              В демо недоступно
             </button>
           )}
+          <button
+            type="button"
+            className="border-0 bg-transparent text-[14px] font-medium leading-5 tracking-[0.07px] text-[rgba(3,3,6,0.88)]"
+          >
+            Все условия
+          </button>
         </div>
       </div>
 

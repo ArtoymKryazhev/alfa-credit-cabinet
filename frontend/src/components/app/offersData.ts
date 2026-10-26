@@ -17,6 +17,21 @@ export type OfferBadge = {
   tone: 'green' | 'orange'
 }
 
+export type ProductCode =
+  | 'working_capital'
+  | 'alfa_start'
+  | 'business_development'
+  | 'gov_program'
+  | 'refinance'
+  | 'auto_loan'
+  | 'business_mortgage'
+  | 'leasing'
+  | 'revolving_line'
+  | 'overdraft'
+  | 'credit_card'
+  | 'bank_guarantee'
+  | 'factoring'
+
 export type Offer = {
   id: string
   title: string
@@ -24,6 +39,7 @@ export type Offer = {
   description: string
   image: string
   badge?: OfferBadge
+  productCode?: ProductCode
 }
 
 export const offers: Offer[] = [
@@ -34,6 +50,7 @@ export const offers: Offer[] = [
     description:
       'Гарантии для коммерческих и государственных закупок по 44-ФЗ, 223-ФЗ и 185-ФЗ',
     image: bannerBankGuarantee,
+    productCode: 'bank_guarantee',
   },
   {
     id: 'factoring',
@@ -41,6 +58,7 @@ export const offers: Offer[] = [
     terms: ['До 150 млн ₽', 'Без залога'],
     description: 'Финансирование дебиторской задолженности',
     image: bannerFactoring,
+    productCode: 'factoring',
   },
   {
     id: 'revolving-line',
@@ -49,6 +67,7 @@ export const offers: Offer[] = [
     description:
       'Возможность брать транши на любые суммы в пределах лимита. При погашении транша лимит восстанавливается',
     image: bannerRevolvingLine,
+    productCode: 'revolving_line',
   },
   {
     id: 'alfa-start-fast',
@@ -57,6 +76,7 @@ export const offers: Offer[] = [
     description: 'Без финансовых документов',
     image: bannerAlfaStart,
     badge: { label: 'ОДОБРЕНО', tone: 'green' },
+    productCode: 'alfa_start',
   },
   {
     id: 'business-dev',
@@ -64,6 +84,7 @@ export const offers: Offer[] = [
     terms: ['До 150 млн ₽', 'Любые бизнес-цели'],
     description: 'Получите для вашего дела нужную сумму сразу',
     image: bannerBusinessDev,
+    productCode: 'business_development',
   },
   {
     id: 'business-mortgage',
@@ -71,6 +92,7 @@ export const offers: Offer[] = [
     terms: ['до 150 млн ₽', '10 лет', 'Недвижимость в залог'],
     description: 'Покупка жилой или коммерческой недвижимости с аккредитивом',
     image: bannerBusinessMortgage,
+    productCode: 'business_mortgage',
   },
   {
     id: 'leasing',
@@ -78,6 +100,7 @@ export const offers: Offer[] = [
     terms: ['До 500 млн ₽', 'Без залога'],
     description: 'Обновите свой парк техники выгодно',
     image: bannerLeasing,
+    productCode: 'leasing',
   },
   {
     id: 'overdraft',
@@ -86,6 +109,7 @@ export const offers: Offer[] = [
     description:
       'Возможность уходить в минус по счёту и пользоваться деньгами банка, когда нужно',
     image: bannerOverdraft,
+    productCode: 'overdraft',
   },
   {
     id: 'business-loan',
@@ -94,6 +118,7 @@ export const offers: Offer[] = [
     description:
       'Кредит одной суммой на пополнение оборотных средств и инвестиционные цели',
     image: bannerBusinessLoan,
+    productCode: 'working_capital',
   },
   {
     id: 'gov-program',
@@ -102,6 +127,7 @@ export const offers: Offer[] = [
     description:
       'Поручительство Корпорации МСП — бесплатно для клиента. Ставка снижена. Любые бизнес-цели. Узнайте, подходит ли вам программа',
     image: bannerGovProgram,
+    productCode: 'gov_program',
   },
   {
     id: 'auto-loan',
@@ -109,6 +135,7 @@ export const offers: Offer[] = [
     terms: ['До 50 млн ₽', 'До 120 месяцев'],
     description: 'Под залог приобретаемого транспорта и спецтехники',
     image: bannerAutoLoan,
+    productCode: 'auto_loan',
   },
   {
     id: 'refinance',
@@ -117,6 +144,7 @@ export const offers: Offer[] = [
     description:
       'Переведите кредит в Альфа-Банк и платите меньше каждый месяц. Можно объединить кредиты из разных банков и управлять выплатами в одном банке',
     image: bannerRefinance,
+    productCode: 'refinance',
   },
   {
     id: 'credit-card',
@@ -125,6 +153,7 @@ export const offers: Offer[] = [
     description: 'До 120 дней без % и кэшбэк до 10% на выбранные категории',
     image: bannerCreditCard,
     badge: { label: 'РЕКОМЕНДУЕМ', tone: 'green' },
+    productCode: 'credit_card',
   },
   {
     id: 'alfa-start',
@@ -132,6 +161,7 @@ export const offers: Offer[] = [
     terms: ['До 1 млн ₽', 'До 18 мес', 'Без залога', 'С 1 дня регистрации'],
     description: 'Быстрый кредит для бизнеса',
     image: bannerAlfaStart,
+    productCode: 'alfa_start',
   },
   {
     id: 'credit-card-alt',
@@ -140,5 +170,6 @@ export const offers: Offer[] = [
     description: 'До 120 дней без % и кэшбэк до 10% на выбранные категории',
     image: bannerCreditCard,
     badge: { label: 'ОДОБРЕНО', tone: 'orange' },
+    productCode: 'credit_card',
   },
 ]

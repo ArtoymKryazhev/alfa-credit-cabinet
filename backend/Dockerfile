@@ -7,8 +7,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     DATA_DIR=/data \
     UPLOADS_DIR=/data/uploads
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt requirements.lock ./
+RUN pip install --no-cache-dir -r requirements.txt -c requirements.lock
 
 COPY app ./app
 

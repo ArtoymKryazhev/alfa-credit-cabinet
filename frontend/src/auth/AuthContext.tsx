@@ -12,6 +12,7 @@ import {
   loginRequest,
   logoutRequest,
   meRequest,
+  rememberClientLogin,
   type AuthUser,
 } from '../api/auth'
 import { getAuthToken, setAuthToken } from '../api/client'
@@ -63,6 +64,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (loginName: string, password: string = DEMO_PASSWORD) => {
       await loginRequest(loginName, password)
       const me = await meRequest()
+      if (me.role === 'client') {
+        rememberClientLogin(me.login)
+      }
       setUser(me)
       return me
     },

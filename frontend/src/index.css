@@ -47,12 +47,6 @@ body {
   zoom: clamp(0.75, 100vw / 1920px, 1);
 }
 
-/* Same zoom as artboard; outside it so position:fixed sticks to the viewport */
-.app-intellect-bar-dock {
-  width: max(100%, 1920px);
-  zoom: clamp(0.75, 100vw / 1920px, 1);
-}
-
 /*
   Desktop proportional scale — /login (1920×1610: hero 786 + business 824).
   Top-pinned; black sides only; light bleed from hero down;

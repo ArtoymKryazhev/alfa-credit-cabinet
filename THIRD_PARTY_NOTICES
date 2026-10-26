@@ -1,0 +1,115 @@
+THIRD PARTY NOTICES
+===================
+
+Project: alfa-credit-cabinet (Alfa Bank hackathon MVP)
+This file lists third-party components, base images, demo assets, and
+simulated integrations used by the prototype.
+
+---------------------------------------------------------------------------
+1. Python runtime dependencies (backend)
+---------------------------------------------------------------------------
+Versions are constrained by backend/requirements.lock (install via
+  pip install -r requirements.txt -c requirements.lock).
+
+Package                 Version     License
+-------                 -------     -------
+fastapi                 0.162.0     MIT
+uvicorn                 0.54.0      BSD-3-Clause
+SQLAlchemy              2.1.6       MIT
+python-multipart        0.0.20      Apache-2.0
+starlette               1.10.0      BSD-3-Clause
+pydantic                2.14.1      MIT
+pydantic_core           2.50.1      MIT
+anyio                   4.15.1      MIT
+h11                     0.16.0      MIT
+httptools               0.9.0       MIT
+watchfiles              1.3.0       MIT
+websockets              17.3        BSD-3-Clause
+click                   8.5.0       BSD-3-Clause
+annotated-types         0.8.0       MIT
+annotated-doc           0.0.5       MIT
+typing_extensions       4.16.0      MIT
+typing-inspection       0.4.4       MIT
+python-dotenv           1.2.4       BSD-3-Clause
+PyYAML                  6.0.3       MIT
+idna                    3.20        BSD-3-Clause
+colorama                0.4.6       BSD-3-Clause
+
+Python standard library is used for PBKDF2 password hashing (no third-party
+crypto package).
+
+Dev-only (not shipped in the Docker runtime image): pytest, httpx, and their
+transitive dependencies — see backend/requirements-dev.txt.
+
+---------------------------------------------------------------------------
+2. npm dependencies (frontend)
+---------------------------------------------------------------------------
+Locked by frontend/package-lock.json (npm ci).
+
+Runtime:
+  react                 19.3.1      MIT
+  react-dom             19.3.1      MIT
+  react-router-dom      7.18.4      MIT
+
+Build / tooling (image build stage):
+  vite                  8.x         MIT
+  @vitejs/plugin-react  6.x         MIT
+  typescript            6.x         Apache-2.0
+  tailwindcss           4.x         MIT
+  @tailwindcss/vite     4.x         MIT
+  oxlint                1.x         MIT
+  @types/react          19.x        MIT
+  @types/react-dom      19.x        MIT
+  @types/node           24.x        MIT
+
+Transitive npm packages follow licenses declared in their package.json
+files under node_modules (mostly MIT / Apache-2.0 / BSD).
+
+---------------------------------------------------------------------------
+3. Docker base images
+---------------------------------------------------------------------------
+  python:3.12-slim     — Python Software Foundation / Debian base
+  node:22-alpine       — Node.js / Alpine Linux
+  nginx:alpine         — nginx / Alpine Linux
+
+Refer to the respective upstream image documentation and OS package
+licenses for full notices.
+
+---------------------------------------------------------------------------
+4. UI demo assets
+---------------------------------------------------------------------------
+Icons, product banners and decorative images under frontend/src/assets/
+are prepared for the hackathon demo UI (Figma case styling inspired by
+Alfa Bank visual language). They are synthetic demo assets for this
+prototype only and are not an official Alfa Bank product kit.
+
+System fonts (system-ui, Segoe UI, Roboto, Helvetica, Arial) — no
+webfonts bundled.
+
+---------------------------------------------------------------------------
+5. Simulated integrations (mocks)
+---------------------------------------------------------------------------
+No live bank / bureau / registry / news APIs are called.
+
+Local JSON mocks in backend/app/mocks/data/:
+  registry.json   — demo company registry
+  finance.json    — synthetic cash-flow series
+  bki.json        — synthetic credit-history snippets (+ unavailable flag)
+  products.json   — product catalogue limits / rates
+  news.json       — tagged demo news items
+
+Each record carries source / as_of metadata for transparency.
+
+---------------------------------------------------------------------------
+6. Datasets and ML models
+---------------------------------------------------------------------------
+  Datasets: synthetic seed only (demo users client1–client5, manager;
+            no real personal data).
+  ML / LLM models: none used in the MVP.
+
+---------------------------------------------------------------------------
+7. Additional notes
+---------------------------------------------------------------------------
+Full license texts for the listed open-source packages are available from
+the upstream project repositories and from the installed package metadata
+(pip show / node_modules/*/LICENSE*).

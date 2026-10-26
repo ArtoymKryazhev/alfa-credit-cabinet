@@ -10,8 +10,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import app.models  # noqa: F401 — register ORM metadata for create_all
 from app.config import get_settings
-from app.db import Base, SessionLocal, engine
-from app.routers import auth, health, manager
+from app.db import Base, SessionLocal, engine, ensure_columns
+from app.routers import applications, attachments, auth, health, manager, news, profile
 from app.seed import run_seed
 
 
@@ -21,6 +21,7 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     settings.data_dir.mkdir(parents=True, exist_ok=True)
     settings.uploads_dir.mkdir(parents=True, exist_ok=True)
     Base.metadata.create_all(bind=engine)
+    ensure_columns(engine)
     with SessionLocal() as session:
         run_seed(session)
         session.commit()
@@ -45,4 +46,8 @@ app.add_middleware(
 
 app.include_router(health.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
+app.include_router(profile.router, prefix="/api")
+app.include_router(applications.router, prefix="/api")
 app.include_router(manager.router, prefix="/api")
+app.include_router(attachments.router, prefix="/api")
+app.include_router(news.router, prefix="/api")

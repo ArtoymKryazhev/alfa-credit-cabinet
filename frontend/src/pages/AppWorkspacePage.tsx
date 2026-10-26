@@ -1,18 +1,40 @@
-import { useState } from 'react'
-import { AlfaIntellectBar } from '../components/app/AlfaIntellectBar'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { AppHeader, type AppSection } from '../components/app/AppHeader'
+import { ApplicationDetailSection } from '../components/app/ApplicationDetailSection'
+import { ApplicationsListSection } from '../components/app/ApplicationsListSection'
 import { AppMarketingFooter } from '../components/app/AppMarketingFooter'
 import { MyBusinessSection } from '../components/app/MyBusinessSection'
 import { OffersFireChip } from '../components/app/OffersFireChip'
 import { OffersSection } from '../components/app/OffersSection'
 
+function sectionFromPath(pathname: string): AppSection {
+  if (pathname.startsWith('/app/applications')) return 'applications'
+  if (pathname.startsWith('/app/business')) return 'business'
+  return 'products'
+}
+
 export function AppWorkspacePage() {
-  const [section, setSection] = useState<AppSection>('products')
+  const location = useLocation()
+  const navigate = useNavigate()
+  const params = useParams<{ id?: string }>()
+  const section = sectionFromPath(location.pathname)
+
+  function handleSectionChange(next: AppSection) {
+    if (next === 'business') {
+      navigate('/app/business')
+      return
+    }
+    if (next === 'applications') {
+      navigate('/app/applications')
+      return
+    }
+    navigate('/app')
+  }
 
   return (
     <div className="min-h-screen overflow-x-clip overflow-y-auto bg-[#0b0b0c]">
       <div className="app-desktop-artboard relative min-h-screen font-['Segoe_UI',system-ui,sans-serif]">
-        <AppHeader activeSection={section} onSectionChange={setSection} />
+        <AppHeader activeSection={section} onSectionChange={handleSectionChange} />
 
         {section === 'products' ? (
           <>
@@ -34,14 +56,25 @@ export function AppWorkspacePage() {
               <AppMarketingFooter />
             </div>
           </>
-        ) : (
+        ) : null}
+
+        {section === 'business' ? (
           <div className="relative z-10 min-h-[calc(100vh-92px)] overflow-visible rounded-t-[60px] bg-[#f2f3f5] pb-16">
             <MyBusinessSection />
           </div>
-        )}
+        ) : null}
+
+        {section === 'applications' ? (
+          <div className="relative z-10 min-h-[calc(100vh-92px)] overflow-visible rounded-t-[60px] bg-[#f2f3f5] pb-16">
+            {params.id ? (
+              <ApplicationDetailSection applicationId={params.id} />
+            ) : (
+              <ApplicationsListSection />
+            )}
+          </div>
+        ) : null}
       </div>
 
-      {section === 'products' ? <AlfaIntellectBar /> : null}
     </div>
   )
 }

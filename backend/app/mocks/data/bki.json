@@ -1,0 +1,52 @@
+[
+  {
+    "inn": "7701000001",
+    "monthly_payments": 150000,
+    "total_debt": 1800000,
+    "current_overdue_days": 0,
+    "max_overdue_days_12m": 0,
+    "unavailable_attempts": 0,
+    "source": "Демо-БКИ",
+    "as_of": "2026-10-01"
+  },
+  {
+    "inn": "7701000002",
+    "monthly_payments": 100000,
+    "total_debt": 900000,
+    "current_overdue_days": 0,
+    "max_overdue_days_12m": 0,
+    "unavailable_attempts": 0,
+    "source": "Демо-БКИ",
+    "as_of": "2026-10-01"
+  },
+  {
+    "inn": "7701000003",
+    "monthly_payments": 400000,
+    "total_debt": 3500000,
+    "current_overdue_days": 0,
+    "max_overdue_days_12m": 20,
+    "unavailable_attempts": 0,
+    "source": "Демо-БКИ",
+    "as_of": "2026-10-01"
+  },
+  {
+    "inn": "7701000004",
+    "monthly_payments": 200000,
+    "total_debt": 2500000,
+    "current_overdue_days": 45,
+    "max_overdue_days_12m": 90,
+    "unavailable_attempts": 0,
+    "source": "Демо-БКИ",
+    "as_of": "2026-10-01"
+  },
+  {
+    "inn": "7701000005",
+    "monthly_payments": 120000,
+    "total_debt": 1100000,
+    "current_overdue_days": 0,
+    "max_overdue_days_12m": 0,
+    "unavailable_attempts": 1,
+    "source": "Демо-БКИ",
+    "as_of": "2026-10-01"
+  }
+]

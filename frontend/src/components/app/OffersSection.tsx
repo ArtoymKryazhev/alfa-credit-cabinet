@@ -1,12 +1,36 @@
-import { Fragment } from 'react'
+import { Fragment, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { ApiError } from '../../api/client'
+import { openApplication } from '../../api/applications'
 import chevronIcon from '../../assets/app/icon-chevron.svg'
 import { AlfaPodborCard } from './AlfaPodborCard'
+import { NewsSection } from './NewsSection'
 import { OfferCard } from './OfferCard'
-import { offers } from './offersData'
+import { offers, type Offer } from './offersData'
 
 const filters = ['Сумма', 'Обеспечение', 'Цель'] as const
 
 export function OffersSection() {
+  const navigate = useNavigate()
+  const [busyOfferId, setBusyOfferId] = useState<string | null>(null)
+  const [applyError, setApplyError] = useState<string | null>(null)
+
+  async function handleApply(offer: Offer) {
+    if (!offer.productCode) return
+    setApplyError(null)
+    setBusyOfferId(offer.id)
+    try {
+      const application = await openApplication(offer.productCode)
+      navigate(`/app/applications/${application.id}`)
+    } catch (err) {
+      const message =
+        err instanceof ApiError ? err.message : 'Не удалось открыть заявку'
+      setApplyError(message)
+    } finally {
+      setBusyOfferId(null)
+    }
+  }
+
   return (
     <section className="relative z-10 mx-auto w-[1074px] pt-[22px]">
       <div className="px-[50px]">
@@ -27,14 +51,24 @@ export function OffersSection() {
           ))}
         </div>
 
+        {applyError ? (
+          <p className="mt-4 m-0 text-[14px] leading-5 text-[#ef3124]">{applyError}</p>
+        ) : null}
+
         <div className="mt-6 flex flex-col gap-6">
           {offers.map((offer, index) => (
             <Fragment key={offer.id}>
-              <OfferCard offer={offer} showBusinessCta={index === 0} />
+              <OfferCard
+                offer={offer}
+                onApply={(item) => void handleApply(item)}
+                applyBusy={busyOfferId === offer.id}
+              />
               {(index + 1) % 4 === 0 ? <AlfaPodborCard /> : null}
             </Fragment>
           ))}
         </div>
+
+        <NewsSection />
       </div>
     </section>
   )

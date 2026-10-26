@@ -51,4 +51,18 @@ export const DEMO_ACCOUNTS = [
   { login: 'manager', label: 'manager — менеджер', role: 'manager' },
 ] as const
 
+export const DEMO_CLIENT_ACCOUNTS = DEMO_ACCOUNTS.filter(
+  (account) => account.role === 'client',
+)
+
 export const DEMO_PASSWORD = 'demo'
+
+export const LAST_CLIENT_LOGIN_KEY = 'alfa_last_client_login'
+
+export function rememberClientLogin(login: string): void {
+  localStorage.setItem(LAST_CLIENT_LOGIN_KEY, login)
+}
+
+export function getLastClientLogin(): string {
+  return localStorage.getItem(LAST_CLIENT_LOGIN_KEY) || 'client1'
+}

@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from collections.abc import Generator
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.config import get_settings
@@ -30,6 +31,24 @@ SessionLocal = sessionmaker(
 
 class Base(DeclarativeBase):
     """Shared declarative base for ORM models."""
+
+
+def ensure_columns(bind: Engine | None = None) -> None:
+    """Idempotent ALTER for columns added after first create_all (SQLite)."""
+    target = bind or engine
+    if not str(target.url).startswith("sqlite"):
+        return
+    with target.begin() as conn:
+        rows = conn.execute(text("PRAGMA table_info(decisions)")).fetchall()
+        if not rows:
+            return
+        columns = {row[1] for row in rows}
+        if "alternative_amount" not in columns:
+            conn.execute(
+                text(
+                    "ALTER TABLE decisions ADD COLUMN alternative_amount INTEGER"
+                )
+            )
 
 
 def get_db() -> Generator[Session, None, None]:

@@ -1,13 +1,30 @@
-import { useId, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { ApiError } from '../../api/client'
+import {
+  getProfile,
+  lookupRegistry,
+  saveProfile,
+  type BusinessProfile,
+  type RegistryCompany,
+} from '../../api/profile'
 import {
   activityOptions,
-  businessProfileMock,
-  partialFormDefaults,
   type ActivityOption,
   type DemoDocument,
 } from './businessProfileMock'
+import {
+  buttonRow,
+  fieldClass,
+  fieldWrapClass,
+  ghostLink,
+  labelClass,
+  primaryBtn,
+  secondaryBtn,
+  selectClass,
+  surfaceCard,
+  textareaClass,
+} from './uiClasses'
 
-type DemoPreset = 'empty' | 'partial' | 'filled'
 type WizardStep = 1 | 2 | 3
 type ViewMode = 'wizard' | 'partial-home' | 'done' | 'profile'
 
@@ -20,6 +37,16 @@ type FormFields = {
   email: string
 }
 
+type CompanyCardData = {
+  companyName: string
+  inn: string
+  registrationDate: string
+  address: string
+  activities: string
+  source: string
+  asOf: string
+}
+
 const emptyForm: FormFields = {
   inn: '',
   activityDirection: '',
@@ -27,15 +54,6 @@ const emptyForm: FormFields = {
   contactPerson: '',
   phone: '',
   email: '',
-}
-
-const filledForm: FormFields = {
-  inn: businessProfileMock.inn,
-  activityDirection: businessProfileMock.activityDirection,
-  description: businessProfileMock.description,
-  contactPerson: businessProfileMock.contactPerson,
-  phone: businessProfileMock.phone,
-  email: businessProfileMock.email,
 }
 
 const stepLabels = [
@@ -50,31 +68,58 @@ const documentCategories = [
   'Примеры работ',
 ] as const
 
-const demoBtnBase =
-  'rounded-full border bg-transparent px-2.5 py-0.5 text-[12px] leading-4 transition-colors'
-const demoBtnActive =
-  'border-[#ef3124] text-[#ef3124]'
-const demoBtnIdle =
-  'border-[rgba(3,3,6,0.18)] text-[rgba(3,3,6,0.55)] hover:border-[rgba(3,3,6,0.35)] hover:text-[rgba(3,3,6,0.88)]'
+function isActivityOption(value: string | null | undefined): value is ActivityOption {
+  return (
+    !!value &&
+    (activityOptions as readonly string[]).includes(value)
+  )
+}
 
-const fieldClass =
-  'mb-field mt-0 box-border h-14 w-full rounded-[10px] border-0 border-b-2 border-[#babbc2] bg-[rgba(38,55,88,0.06)] px-3 pb-2 pt-6 text-[16px] leading-5 tracking-[-0.24px] text-[rgba(3,3,6,0.88)] outline-none transition-[border-color,background-color] duration-200 placeholder:text-[rgba(4,4,19,0.55)] focus:border-[#ef3124]'
-const textareaClass =
-  'mb-field mt-0 box-border min-h-[120px] w-full resize-y rounded-[10px] border-0 border-b-2 border-[#babbc2] bg-[rgba(38,55,88,0.06)] px-3 pb-3 pt-6 text-[16px] leading-5 tracking-[-0.24px] text-[rgba(3,3,6,0.88)] outline-none transition-[border-color,background-color] duration-200 placeholder:text-[rgba(4,4,19,0.55)] focus:border-[#ef3124]'
-const selectClass = `${fieldClass} mb-field-select appearance-none`
-const labelClass =
-  'pointer-events-none absolute left-3 top-2 text-[14px] leading-[17.5px] tracking-[-0.21px] text-[rgba(4,4,19,0.55)] transition-colors duration-200 group-focus-within:text-[#ef3124]'
-const fieldWrapClass = 'group relative mt-5 block'
-const primaryBtn =
-  'inline-flex h-12 flex-1 items-center justify-center rounded-[10px] border-0 bg-[#ef3124] px-6 text-[16px] leading-5 tracking-[-0.05px] text-[rgba(255,255,255,0.94)] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ef3124]'
-const secondaryBtn =
-  'inline-flex h-12 flex-1 items-center justify-center rounded-[10px] border-0 bg-[rgba(15,25,55,0.1)] px-6 text-[16px] leading-5 tracking-[-0.05px] text-[rgba(3,3,6,0.88)] transition-colors hover:bg-[rgba(15,25,55,0.16)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgba(15,25,55,0.4)]'
-const ghostLink =
-  'border-0 bg-transparent p-0 text-[14px] leading-5 text-[#ef3124] underline-offset-2 hover:underline'
-const surfaceCard = 'rounded-[32px] bg-white'
-const buttonRow = 'mt-6 flex w-full gap-2'
+function formFromProfile(profile: BusinessProfile): FormFields {
+  return {
+    inn: profile.inn ?? '',
+    activityDirection: isActivityOption(profile.activity_direction)
+      ? profile.activity_direction
+      : '',
+    description: profile.description ?? '',
+    contactPerson: profile.contact_person ?? '',
+    phone: profile.contact_phone ?? '',
+    email: profile.contact_email ?? '',
+  }
+}
 
-function CompanySummaryCard({ compact = false }: { compact?: boolean }) {
+function companyFromProfile(profile: BusinessProfile): CompanyCardData | null {
+  if (!profile.inn || !profile.company_name) return null
+  return {
+    companyName: profile.company_name,
+    inn: profile.inn,
+    registrationDate: profile.registration_date ?? '',
+    address: profile.address ?? '',
+    activities: profile.activities ?? '',
+    source: profile.registry_source ?? '',
+    asOf: profile.registry_as_of ?? '',
+  }
+}
+
+function companyFromRegistry(company: RegistryCompany): CompanyCardData {
+  return {
+    companyName: company.name,
+    inn: company.inn,
+    registrationDate: company.registration_date,
+    address: company.address,
+    activities: company.activities,
+    source: company.source,
+    asOf: company.as_of,
+  }
+}
+
+function CompanySummaryCard({
+  company,
+  compact = false,
+}: {
+  company: CompanyCardData
+  compact?: boolean
+}) {
   return (
     <div
       className={`rounded-[16px] bg-[rgba(38,55,88,0.04)] ${
@@ -83,32 +128,29 @@ function CompanySummaryCard({ compact = false }: { compact?: boolean }) {
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h3 className="m-0 text-[18px] font-bold leading-6 tracking-[0.1px] text-[rgba(3,3,6,0.88)]">
-          {businessProfileMock.companyName}
+          {company.companyName}
         </h3>
         <span className="text-[12px] leading-4 tracking-[0.06px] text-[rgba(3,3,6,0.55)]">
-          Демонстрационные данные
+          Источник: {company.source}
+          {company.asOf ? `, данные на ${company.asOf}` : ''}
         </span>
       </div>
       <dl className="mt-4 m-0 grid gap-3 text-[14px] leading-5">
         <div className="flex flex-wrap gap-x-2">
           <dt className="m-0 text-[rgba(3,3,6,0.55)]">ИНН</dt>
-          <dd className="m-0 text-[rgba(3,3,6,0.88)]">{businessProfileMock.inn}</dd>
+          <dd className="m-0 text-[rgba(3,3,6,0.88)]">{company.inn}</dd>
         </div>
         <div className="flex flex-wrap gap-x-2">
           <dt className="m-0 text-[rgba(3,3,6,0.55)]">Дата регистрации</dt>
-          <dd className="m-0 text-[rgba(3,3,6,0.88)]">
-            {businessProfileMock.registrationDate}
-          </dd>
+          <dd className="m-0 text-[rgba(3,3,6,0.88)]">{company.registrationDate}</dd>
         </div>
         <div className="flex flex-col gap-0.5">
           <dt className="m-0 text-[rgba(3,3,6,0.55)]">Адрес регистрации</dt>
-          <dd className="m-0 text-[rgba(3,3,6,0.88)]">{businessProfileMock.address}</dd>
+          <dd className="m-0 text-[rgba(3,3,6,0.88)]">{company.address}</dd>
         </div>
         <div className="flex flex-col gap-0.5">
           <dt className="m-0 text-[rgba(3,3,6,0.55)]">Виды деятельности</dt>
-          <dd className="m-0 text-[rgba(3,3,6,0.88)]">
-            {businessProfileMock.activities}
-          </dd>
+          <dd className="m-0 text-[rgba(3,3,6,0.88)]">{company.activities}</dd>
         </div>
       </dl>
     </div>
@@ -187,75 +229,182 @@ export function MyBusinessSection() {
   const fileInputId = useId()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const [demoPreset, setDemoPreset] = useState<DemoPreset>('empty')
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [lookupError, setLookupError] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
+
+  const [profile, setProfile] = useState<BusinessProfile | null>(null)
   const [viewMode, setViewMode] = useState<ViewMode>('wizard')
   const [step, setStep] = useState<WizardStep>(1)
   const [companyFound, setCompanyFound] = useState(false)
+  const [companyCard, setCompanyCard] = useState<CompanyCardData | null>(null)
   const [form, setForm] = useState<FormFields>(emptyForm)
   const [documents, setDocuments] = useState<DemoDocument[]>([])
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null)
 
-  function applyPreset(preset: DemoPreset) {
-    setDemoPreset(preset)
+  const applyLoadedProfile = useCallback((data: BusinessProfile) => {
+    setProfile(data)
+    setForm(formFromProfile(data))
+    setLookupError(null)
+    setSaveError(null)
     setSelectedFileName(null)
 
-    if (preset === 'empty') {
-      setViewMode('wizard')
-      setStep(1)
-      setCompanyFound(false)
-      setForm(emptyForm)
-      setDocuments([])
-      return
-    }
+    const card = companyFromProfile(data)
+    setCompanyCard(card)
 
-    if (preset === 'partial') {
-      setViewMode('partial-home')
-      setStep(2)
+    if (data.completeness === 'filled') {
+      setViewMode('profile')
       setCompanyFound(true)
-      setForm({
-        ...emptyForm,
-        inn: businessProfileMock.inn,
-        ...partialFormDefaults,
-      })
-      setDocuments([])
+      setStep(1)
       return
     }
-
-    setViewMode('profile')
+    if (data.completeness === 'partial') {
+      setViewMode('partial-home')
+      setCompanyFound(true)
+      setStep(2)
+      return
+    }
+    setViewMode('wizard')
+    setCompanyFound(false)
     setStep(1)
-    setCompanyFound(true)
-    setForm(filledForm)
-    setDocuments([...businessProfileMock.documents])
-  }
+  }, [])
+
+  const reloadProfile = useCallback(async () => {
+    setLoading(true)
+    setLoadError(null)
+    try {
+      const data = await getProfile()
+      applyLoadedProfile(data)
+    } catch (err) {
+      const message =
+        err instanceof ApiError ? err.message : 'Не удалось загрузить профиль'
+      setLoadError(message)
+    } finally {
+      setLoading(false)
+    }
+  }, [applyLoadedProfile])
+
+  useEffect(() => {
+    void reloadProfile()
+  }, [reloadProfile])
 
   function updateField<K extends keyof FormFields>(key: K, value: FormFields[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
   }
 
   function openEditCompany() {
-    setForm(filledForm)
+    if (!profile) return
+    setForm(formFromProfile(profile))
+    setCompanyCard(companyFromProfile(profile))
     setCompanyFound(true)
-    setDocuments([...businessProfileMock.documents])
     setStep(1)
     setViewMode('wizard')
+    setLookupError(null)
+    setSaveError(null)
   }
 
   function openEditContacts() {
-    setForm(filledForm)
+    if (!profile) return
+    setForm(formFromProfile(profile))
+    setCompanyCard(companyFromProfile(profile))
     setCompanyFound(true)
-    setDocuments([...businessProfileMock.documents])
     setStep(2)
     setViewMode('wizard')
+    setSaveError(null)
   }
 
   function openEditDocuments() {
-    setForm(filledForm)
+    if (!profile) return
+    setForm(formFromProfile(profile))
+    setCompanyCard(companyFromProfile(profile))
     setCompanyFound(true)
-    setDocuments((prev) =>
-      prev.length > 0 ? prev : [...businessProfileMock.documents],
-    )
     setStep(3)
     setViewMode('wizard')
+  }
+
+  async function handleLookup() {
+    setLookupError(null)
+    setSaving(true)
+    try {
+      const company = await lookupRegistry(form.inn.trim())
+      setCompanyCard(companyFromRegistry(company))
+      updateField('inn', company.inn)
+      setCompanyFound(true)
+    } catch (err) {
+      const message =
+        err instanceof ApiError ? err.message : 'Не удалось найти компанию'
+      setLookupError(message)
+      setCompanyFound(false)
+      setCompanyCard(null)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleConfirmCompany() {
+    if (!form.inn) return
+    setSaveError(null)
+    setSaving(true)
+    try {
+      const saved = await saveProfile({ inn: form.inn.trim() })
+      setProfile(saved)
+      setForm(formFromProfile(saved))
+      setCompanyCard(companyFromProfile(saved))
+      setStep(2)
+    } catch (err) {
+      const message =
+        err instanceof ApiError ? err.message : 'Не удалось сохранить профиль'
+      setSaveError(message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleSaveStep2AndContinue() {
+    if (!form.inn) return
+    setSaveError(null)
+    setSaving(true)
+    try {
+      const saved = await saveProfile({
+        inn: form.inn.trim(),
+        activity_direction: form.activityDirection || null,
+        description: form.description || null,
+        contact_person: form.contactPerson || null,
+        contact_phone: form.phone || null,
+        contact_email: form.email || null,
+      })
+      setProfile(saved)
+      setForm(formFromProfile(saved))
+      setCompanyCard(companyFromProfile(saved))
+      setStep(3)
+    } catch (err) {
+      const message =
+        err instanceof ApiError ? err.message : 'Не удалось сохранить профиль'
+      setSaveError(message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleFinishWizard() {
+    // Materials are local-only; profile already saved on step 2 / confirm.
+    setViewMode('done')
+  }
+
+  async function handleViewFilledProfile() {
+    setLoading(true)
+    try {
+      const data = await getProfile()
+      applyLoadedProfile(data)
+    } catch (err) {
+      const message =
+        err instanceof ApiError ? err.message : 'Не удалось загрузить профиль'
+      setLoadError(message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   function handleFilePick(fileList: FileList | null) {
@@ -281,13 +430,13 @@ export function MyBusinessSection() {
     })
   }
 
-  function addDemoDocument() {
+  function addLocalDocument() {
     const nextIndex = documents.length + 1
     setDocuments((prev) => [
       ...prev,
       {
         id: `added-${Date.now()}`,
-        name: `material-demo-${nextIndex}.pdf`,
+        name: `material-local-${nextIndex}.pdf`,
         category: 'Примеры работ',
       },
     ])
@@ -295,30 +444,41 @@ export function MyBusinessSection() {
 
   const showStepper = viewMode === 'wizard'
 
+  if (loading) {
+    return (
+      <section className="relative z-10 mx-auto w-[1140px] max-w-full pb-16 pt-[66px]">
+        <h1 className="m-0 text-center text-[40px] font-bold leading-[48px] tracking-[0.1px] text-[rgba(3,3,6,0.88)]">
+          Мой бизнес
+        </h1>
+        <p className="mx-auto mt-8 mb-0 max-w-[640px] text-center text-[16px] leading-6 text-[rgba(3,3,6,0.62)]">
+          Загрузка профиля…
+        </p>
+      </section>
+    )
+  }
+
+  if (loadError) {
+    return (
+      <section className="relative z-10 mx-auto w-[1140px] max-w-full pb-16 pt-[66px]">
+        <h1 className="m-0 text-center text-[40px] font-bold leading-[48px] tracking-[0.1px] text-[rgba(3,3,6,0.88)]">
+          Мой бизнес
+        </h1>
+        <div className={`mx-auto mt-12 w-full max-w-[655px] ${surfaceCard} px-10 py-10 text-center`}>
+          <p className="m-0 text-[16px] leading-6 text-[rgba(3,3,6,0.88)]">{loadError}</p>
+          <button
+            type="button"
+            className={`${primaryBtn} mx-auto mt-6 w-full max-w-[240px] flex-none`}
+            onClick={() => void reloadProfile()}
+          >
+            Повторить
+          </button>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="relative z-10 mx-auto w-[1140px] max-w-full pb-16 pt-[66px]">
-      <div className="absolute left-0 top-4 flex flex-wrap items-center gap-1.5 text-[12px] leading-4 text-[rgba(3,3,6,0.45)]">
-        <span className="mr-0.5">Демо-состояние:</span>
-        {(
-          [
-            ['empty', 'Нет данных'],
-            ['partial', 'Частично заполнено'],
-            ['filled', 'Заполнено'],
-          ] as const
-        ).map(([value, label]) => (
-          <button
-            key={value}
-            type="button"
-            className={`${demoBtnBase} ${
-              demoPreset === value ? demoBtnActive : demoBtnIdle
-            }`}
-            onClick={() => applyPreset(value)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
       <h1 className="m-0 text-center text-[40px] font-bold leading-[48px] tracking-[0.1px] text-[rgba(3,3,6,0.88)]">
         Мой бизнес
       </h1>
@@ -348,9 +508,11 @@ export function MyBusinessSection() {
               Продолжить заполнение
             </button>
           </div>
-          <div className="mt-6">
-            <CompanySummaryCard compact />
-          </div>
+          {companyCard ? (
+            <div className="mt-6">
+              <CompanySummaryCard company={companyCard} compact />
+            </div>
+          ) : null}
         </div>
       ) : null}
 
@@ -360,26 +522,33 @@ export function MyBusinessSection() {
             Заполнение завершено
           </p>
           <p className="mt-3 m-0 text-[16px] leading-6 tracking-[-0.24px] text-[rgba(3,3,6,0.62)]">
-            В прототипе сведения не сохраняются и заявка не отправляется
+            Сведения о компании сохранены. Материалы профиля в MVP остаются только в
+            этом сеансе
           </p>
           <button
             type="button"
             className={`${primaryBtn} mx-auto mt-8 w-full max-w-[320px] flex-none`}
-            onClick={() => applyPreset('filled')}
+            onClick={() => void handleViewFilledProfile()}
           >
             Посмотреть заполненный профиль
           </button>
         </div>
       ) : null}
 
-      {viewMode === 'profile' ? (
+      {viewMode === 'profile' && profile ? (
         <div className="mx-auto mt-12 flex w-full flex-col gap-4">
           <div className={`${surfaceCard} px-8 py-6`}>
             <p className="m-0 text-[22px] font-bold leading-[26px] tracking-[0.2px] text-[rgba(3,3,6,0.88)]">
               Сведения о бизнесе заполнены
             </p>
             <p className="mt-1 m-0 text-[14px] leading-5 text-[rgba(3,3,6,0.55)]">
-              Демонстрационный профиль
+              {profile.registry_source
+                ? `Источник: ${profile.registry_source}${
+                    profile.registry_as_of
+                      ? `, данные на ${profile.registry_as_of}`
+                      : ''
+                  }`
+                : 'Профиль сохранён на сервере'}
             </p>
           </div>
 
@@ -393,17 +562,17 @@ export function MyBusinessSection() {
               </button>
             </div>
             <dl className="mt-5 m-0 grid gap-4 sm:grid-cols-2">
-              <ProfileField label="Название" value={businessProfileMock.companyName} />
-              <ProfileField label="ИНН" value={businessProfileMock.inn} />
+              <ProfileField label="Название" value={profile.company_name ?? '—'} />
+              <ProfileField label="ИНН" value={profile.inn ?? '—'} />
               <ProfileField
                 label="Дата регистрации"
-                value={businessProfileMock.registrationDate}
+                value={profile.registration_date ?? '—'}
               />
-              <ProfileField label="Адрес" value={businessProfileMock.address} />
+              <ProfileField label="Адрес" value={profile.address ?? '—'} />
               <div className="sm:col-span-2">
                 <ProfileField
                   label="Виды деятельности"
-                  value={businessProfileMock.activities}
+                  value={profile.activities ?? '—'}
                 />
               </div>
             </dl>
@@ -421,20 +590,20 @@ export function MyBusinessSection() {
             <dl className="mt-5 m-0 grid gap-4 sm:grid-cols-2">
               <ProfileField
                 label="Основное направление"
-                value={businessProfileMock.activityDirection}
+                value={profile.activity_direction ?? '—'}
               />
               <div className="sm:col-span-2">
                 <ProfileField
                   label="Описание бизнеса"
-                  value={businessProfileMock.description}
+                  value={profile.description ?? '—'}
                 />
               </div>
               <ProfileField
                 label="Контактное лицо"
-                value={businessProfileMock.contactPerson}
+                value={profile.contact_person ?? '—'}
               />
-              <ProfileField label="Телефон" value={businessProfileMock.phone} />
-              <ProfileField label="Email" value={businessProfileMock.email} />
+              <ProfileField label="Телефон" value={profile.contact_phone ?? '—'} />
+              <ProfileField label="Email" value={profile.contact_email ?? '—'} />
             </dl>
           </article>
 
@@ -444,7 +613,7 @@ export function MyBusinessSection() {
                 Материалы
               </h2>
               <div className="flex flex-wrap gap-3">
-                <button type="button" className={ghostLink} onClick={addDemoDocument}>
+                <button type="button" className={ghostLink} onClick={addLocalDocument}>
                   Добавить
                 </button>
                 <button
@@ -456,6 +625,9 @@ export function MyBusinessSection() {
                 </button>
               </div>
             </div>
+            <p className="mt-2 m-0 text-[13px] leading-4 text-[rgba(3,3,6,0.55)]">
+              В MVP материалы профиля не уходят на сервер
+            </p>
             <ul className="mt-5 m-0 flex list-none flex-col gap-2 p-0">
               {documents.length === 0 ? (
                 <li className="rounded-[12px] bg-[rgba(38,55,88,0.04)] px-4 py-3 text-[14px] text-[rgba(3,3,6,0.55)]">
@@ -510,46 +682,64 @@ export function MyBusinessSection() {
                         type="text"
                         className={fieldClass}
                         value={form.inn}
-                        onChange={(e) => updateField('inn', e.target.value)}
+                        onChange={(e) => {
+                          updateField('inn', e.target.value)
+                          setLookupError(null)
+                        }}
                         placeholder="XXXXXXXXXX"
                         autoComplete="off"
                       />
                     </label>
+                    {lookupError ? (
+                      <p className="mt-2 m-0 text-[14px] leading-5 text-[#ef3124]">
+                        {lookupError}
+                      </p>
+                    ) : null}
                     <div className={buttonRow}>
                       <button
                         type="button"
                         className={primaryBtn}
-                        onClick={() => {
-                          setCompanyFound(true)
-                          updateField('inn', businessProfileMock.inn)
-                        }}
+                        disabled={saving || !form.inn.trim()}
+                        onClick={() => void handleLookup()}
                       >
-                        Найти компанию
+                        {saving ? 'Поиск…' : 'Найти компанию'}
                       </button>
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="mt-8">
-                      <CompanySummaryCard />
-                    </div>
+                    {companyCard ? (
+                      <div className="mt-8">
+                        <CompanySummaryCard company={companyCard} />
+                      </div>
+                    ) : null}
                     <p className="mt-6 m-0 text-[16px] font-medium leading-5 text-[rgba(3,3,6,0.88)]">
                       Это ваша компания?
                     </p>
+                    {saveError ? (
+                      <p className="mt-2 m-0 text-[14px] leading-5 text-[#ef3124]">
+                        {saveError}
+                      </p>
+                    ) : null}
                     <div className={buttonRow}>
                       <button
                         type="button"
                         className={primaryBtn}
-                        onClick={() => setStep(2)}
+                        disabled={saving}
+                        onClick={() => void handleConfirmCompany()}
                       >
-                        Да, продолжить
+                        {saving ? 'Сохранение…' : 'Да, продолжить'}
                       </button>
                       <button
                         type="button"
                         className={secondaryBtn}
+                        disabled={saving}
                         onClick={() => {
                           setCompanyFound(false)
+                          setCompanyCard(null)
                           updateField('inn', '')
+                          setLookupError(null)
+                          setSaveError(null)
                         }}
                       >
                         Изменить ИНН
@@ -640,10 +830,17 @@ export function MyBusinessSection() {
                   </label>
                 </div>
 
+                {saveError ? (
+                  <p className="mt-4 m-0 text-[14px] leading-5 text-[#ef3124]">
+                    {saveError}
+                  </p>
+                ) : null}
+
                 <div className={buttonRow}>
                   <button
                     type="button"
                     className={secondaryBtn}
+                    disabled={saving}
                     onClick={() => setStep(1)}
                   >
                     Назад
@@ -651,22 +848,10 @@ export function MyBusinessSection() {
                   <button
                     type="button"
                     className={primaryBtn}
-                    onClick={() => {
-                      setDocuments((prev) =>
-                        prev.length > 0
-                          ? prev
-                          : [
-                              {
-                                id: 'demo-example',
-                                name: 'presentation-demo.pdf',
-                                category: 'Презентация компании',
-                              },
-                            ],
-                      )
-                      setStep(3)
-                    }}
+                    disabled={saving}
+                    onClick={() => void handleSaveStep2AndContinue()}
                   >
-                    Продолжить
+                    {saving ? 'Сохранение…' : 'Продолжить'}
                   </button>
                 </div>
               </>
@@ -745,7 +930,7 @@ export function MyBusinessSection() {
                             {doc.name}
                           </p>
                           <p className="mt-0.5 m-0 text-[13px] leading-4 text-[rgba(3,3,6,0.55)]">
-                            Добавлен в демо
+                            Только в этом сеансе
                           </p>
                         </div>
                         <button
@@ -771,13 +956,13 @@ export function MyBusinessSection() {
                   <button
                     type="button"
                     className={primaryBtn}
-                    onClick={() => setViewMode('done')}
+                    onClick={() => void handleFinishWizard()}
                   >
                     Завершить заполнение
                   </button>
                 </div>
                 <p className="mt-4 m-0 text-[13px] leading-4 text-[rgba(3,3,6,0.55)]">
-                  Демонстрационный режим: данные и файлы не сохраняются
+                  В MVP материалы профиля не уходят на сервер
                 </p>
               </>
             ) : null}
