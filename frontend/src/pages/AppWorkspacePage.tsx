@@ -1,4 +1,5 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { AlfaIntellectBar } from '../components/app/AlfaIntellectBar'
 import { AppHeader, type AppSection } from '../components/app/AppHeader'
 import { ApplicationDetailSection } from '../components/app/ApplicationDetailSection'
 import { ApplicationsListSection } from '../components/app/ApplicationsListSection'
@@ -75,6 +76,7 @@ export function AppWorkspacePage() {
         ) : null}
       </div>
 
+      {section === 'products' ? <AlfaIntellectBar /> : null}
     </div>
   )
 }

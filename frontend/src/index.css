@@ -47,6 +47,26 @@ body {
   zoom: clamp(0.75, 100vw / 1920px, 1);
 }
 
+.app-intellect-bar-dock {
+  width: max(100%, 1920px);
+  zoom: clamp(0.75, 100vw / 1920px, 1);
+}
+
+@keyframes role-switch-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.role-switch-fab-pulse {
+  transform-origin: center;
+  animation: role-switch-pulse 1.6s ease-in-out infinite;
+}
+
 /*
   Desktop proportional scale — /login (1920×1610: hero 786 + business 824).
   Top-pinned; black sides only; light bleed from hero down;

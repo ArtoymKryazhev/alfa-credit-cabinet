@@ -56,6 +56,7 @@ export function OffersSection() {
         ) : null}
 
         <div className="mt-6 flex flex-col gap-6">
+          <AlfaPodborCard />
           {offers.map((offer, index) => (
             <Fragment key={offer.id}>
               <OfferCard
