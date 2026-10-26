@@ -181,4 +181,4 @@ erDiagram
 - `products.json` — 13 продуктов витрины
 - `news.json` — новости с тегами industry/region
 
-Синтетические seed-пользователи: `client1`…`client5`, `manager`, пароль `demo`. См. [`test-scenarios.md`](test-scenarios.md).
+Синтетические seed-пользователи: `client1`…`client5` (ИНН `7701000001`…`7701000005`), `manager`, пароль `demo`. См. [`test-scenarios.md`](test-scenarios.md) и README.

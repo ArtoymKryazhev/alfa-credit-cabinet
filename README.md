@@ -97,16 +97,16 @@ Vite проксирует `/api` на `:8000`. UI: http://localhost:5173.
 
 Пароль для всех: **`demo`**.
 
-| Login | Роль | Компания / сценарий |
-| ----- | ---- | ------------------- |
-| `client1` | client | A — устойчивый бизнес → **авто-предложение** |
-| `client2` | client | B — запрос сверх возможностей → **manual_review + альтернатива** |
-| `client3` | client | C — средний риск → **manual_review** (демо уточнений) |
-| `client4` | client | D — не действует → **авто-отказ** |
-| `client5` | client | E — БКИ unavailable на 1-м прогоне → **manual_review**, recheck успешен |
-| `manager` | manager | Очередь и действия менеджера |
+| Login | Роль | ИНН | Компания / сценарий |
+| ----- | ---- | --- | ------------------- |
+| `client1` | client | `7701000001` | A — ООО «Стабильный поток» → **авто-предложение** |
+| `client2` | client | `7701000002` | B — ООО «Большой запрос» → **manual_review + альтернатива** |
+| `client3` | client | `7701000003` | C — ООО «Средний риск» → **manual_review** (уточнения) |
+| `client4` | client | `7701000004` | D — ООО «Не действует» → **авто-отказ** |
+| `client5` | client | `7701000005` | E — ООО «БКИ пауза» → **manual_review**, recheck успешен |
+| `manager` | manager | — | Очередь и действия менеджера |
 
-Seed профилей: client1/client3 filled; client2 partial; client4/client5 empty до первого заполнения.
+Seed профилей: client1/client3 filled; client2 partial; client4/client5 empty до первого заполнения (для D/E в «Мой бизнес» указать ИНН из таблицы → registry-lookup).
 
 Подробные шаги: [`docs/submission/test-scenarios.md`](docs/submission/test-scenarios.md).
 
@@ -118,8 +118,8 @@ Seed профилей: client1/client3 filled; client2 partial; client4/client5 
 2. **A:** войти `client1` / `demo` → оформить «Кредит для бизнеса» → submit → принять оффер.
 3. **B:** `client2` → высокая сумма → submit → войти `manager` → предложить меньшую сумму → клиент принимает/отклоняет.
 4. **C:** `client3` → submit → менеджер запрашивает уточнение → клиент отвечает (можно с файлом pdf/png/jpg ≤5 МБ).
-5. **D:** `client4` → заполнить профиль → submit → отказ.
-6. **E:** `client5` → submit → менеджер «Повторить проверку».
+5. **D:** `client4` → профиль с ИНН `7701000004` → submit → отказ.
+6. **E:** `client5` → профиль с ИНН `7701000005` → submit → менеджер «Повторить проверку».
 7. На `/app` у клиента с профилем проверить **персонализированные новости**.
 8. Обновить страницу / перезапустить compose — черновики и заявки на месте (том).
 
